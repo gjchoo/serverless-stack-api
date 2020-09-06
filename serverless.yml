@@ -15,13 +15,11 @@ provider:
   runtime: nodejs12.x
   stage: prod
   region: us-east-1
-  # These environment variables are made available to our functions
-  # under process.env.
   environment:
-    tableName: notes
-
-  # 'iamRoleStatements' defines the permission policy for the Lambda function.
-  # In this case Lambda functions are granted with permissions to access DynamoDB.
+    tableUsersName: users
+    tableMemesName: memes
+    tableChatsName: chats
+    tableReportMemesName: reportmemes
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -37,54 +35,120 @@ provider:
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}
-  
+
 functions:
-  create:
-    handler: create.main
+  createUser:
+    handler: api/users/create.main
     events:
       - http:
-          path: notes
+          path: users
           method: post
           cors: true
           authorizer: aws_iam
-  get:
-    handler: get.main
+  getUser:
+    handler: api/users/get.main
     events:
       - http:
-          path: notes/{id}
+          path: users/{id}
           method: get
           cors: true
           authorizer: aws_iam
-  list:
+  listUser:
     # Defines an HTTP API endpoint that calls the main function in list.js
     # - path: url path is /notes
     # - method: GET request
-    handler: list.main
+    handler: api/users/list.main
     events:
       - http:
-          path: notes
+          path: users
           method: get
           cors: true
           authorizer: aws_iam
-  update:
+  matchUser:
+    handler: api/users/match.main
+    events:
+      - http:
+          path: matchusers/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+  updateUser:
     # Defines an HTTP API endpoint that calls the main function in update.js
     # - path: url path is /notes/{id}
     # - method: PUT request
-    handler: update.main
+    handler: api/users/update.main
     events:
       - http:
-          path: notes/{id}
+          path: users/{id}
           method: put
           cors: true
           authorizer: aws_iam
-  delete:
+  deleteUser:
       # Defines an HTTP API endpoint that calls the main function in delete.js
       # - path: url path is /notes/{id}
       # - method: DELETE request
-      handler: delete.main
+      handler: api/users/delete.main
       events:
         - http:
-            path: notes/{id}
+            path: users/{id}
             method: delete
             cors: true
             authorizer: aws_iam
+  reportMeme:
+      # Defines an HTTP API endpoint that calls the main function in delete.js
+      # - path: url path is /notes/{id}
+      # - method: DELETE request
+      handler: api/reportMeme/create.main
+      events:
+        - http:
+            path: reportmemes
+            method: post
+            cors: true
+            authorizer: aws_iam
+  createMeme:
+      # Defines an HTTP API endpoint that calls the main function in delete.js
+      # - path: url path is /notes/{id}
+      # - method: DELETE request
+      handler: api/memes/create.main
+      events:
+        - http:
+            path: memes
+            method: post
+            cors: true
+            authorizer: aws_iam
+  updateMeme:
+    handler: api/memes/update.main
+    events:
+      - http:
+          path: memes/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
+  deleteMeme:
+    handler: api/memes/delete.main
+    events:
+      - http:
+          path: memes/{id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
+  websocket-connect:
+    handler: api/websocket/connect.main
+    events:
+      - websocket:
+          route : $connect
+  websocket-disconnect:
+    handler: api/websocket/disconnect.main
+    events:
+      - websocket:
+          route : $disconnect
+  websocket-default:
+    handler: api/websocket/default.main
+    events:
+      - websocket:
+          route : $default
+  websocket-message:
+    handler: api/websocket/message.main
+    events:
+      - websocket:
+          route : message

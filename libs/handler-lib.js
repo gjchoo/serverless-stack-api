@@ -7,6 +7,7 @@ export default function handler(lambda) {
       body = await lambda(event, context);
       statusCode = 200;
     } catch (e) {
+      console.log('error', e);
       body = { error: e.message };
       statusCode = 500;
     }
@@ -16,6 +17,7 @@ export default function handler(lambda) {
       statusCode,
       body: JSON.stringify(body),
       headers: {
+        'Content-Type': 'application/json',
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": true,
       },
