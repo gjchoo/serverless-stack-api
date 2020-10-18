@@ -6,11 +6,12 @@ export default function handler(lambda) {
       // Run the Lambda
       body = await lambda(event, context);
       statusCode = 200;
+
     } catch (e) {
-      console.log('error', e);
       body = { error: e.message };
       statusCode = 500;
-    }
+
+    };
 
     // Return HTTP response
     return {

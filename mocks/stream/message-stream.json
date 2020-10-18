@@ -1,0 +1,16 @@
+{
+  "Records" : [{
+    "dynamodb" : {
+      "NewImage" : {
+        "conversationId" : "room1122",
+        "text" : "hello world", 
+        "user" : {
+          "_id" : "us-east-1:8fd958f4-7c82-4815-8abb-c3aead916688"
+        },
+        "timestamp" : "123123123",
+        "messageId" : "asdasdasd"
+      }
+    },
+    "eventName" : "INSERT"
+  }]
+}

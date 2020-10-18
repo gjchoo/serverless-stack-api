@@ -1,8 +1,0 @@
-{
-  "body": "{\"displayName\":\"GJCHOO\",\"photos\":\"[]\", \"dob\":\"1714972800\", \"horoscope\":\"Scoprio\", \"gender\":\"Male\", \"bio\":\"This is dummy bio text\", \"job\":\"Programmer\", \"education\":\"Bachelor\", \"current_location\":\"Singapore\", \"privacy\":\"false\", \"account_status\":\"true\", \"userUuid\":\"us-east-1:8a60084d-61de-4833-8fc9-cde26216dbf0\"}",
-  "requestContext": {
-    "identity": {
-      "cognitoIdentityId": "us-east-1:8a60084d-61de-4833-8fc9-cde26216dbf0"
-    }
-  }
-}

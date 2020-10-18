@@ -1,0 +1,8 @@
+{
+  "body": "{\"userId\":\"us-east-1:83fc721f-f08e-4780-8e42-781b2f76635b\",\"userId_liked_user\":\"us-east-1:8fd958f4-7c82-4815-8abb-c3aead916688\", \"relationship\":\"reject\"}",
+    "requestContext": {
+    "identity": {
+      "cognitoIdentityId": "USER-SUB-1234"
+    }
+  }
+}

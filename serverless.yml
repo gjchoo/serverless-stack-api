@@ -1,5 +1,5 @@
 # NOTE: update this with your service name
-service: notes-app-api
+service: memeup
 
 # Create an optimized package for our functions 
 package:
@@ -13,13 +13,20 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: prod
+  stage: dev
   region: us-east-1
   environment:
-    tableUsersName: users
-    tableMemesName: memes
-    tableChatsName: chats
-    tableReportMemesName: reportmemes
+    tableUsers: users
+    tableMemes: memes
+    tableChats: chats
+    tableReportMemes: reportmemes
+    tableConnectionId: connectionId
+    tableMessages: messages
+    tableConversations: conversations
+    tableUnMatches: unmatchusers
+    tableLikes: likes
+    domainName: sa8xdq5xmf.execute-api.us-east-1.amazonaws.com
+    stage: dev
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -30,125 +37,120 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+      Resource: 
+        - "arn:aws:dynamodb:us-east-1:*:*"
+        - "arn:aws:dynamodb:us-east-1:496442284755:table/messages"
+        - "arn:aws:dynamodb:us-east-1:496442284755:table/messages/*"
+        - "arn:aws:dynamodb:us-east-1:496442284755:table/conversations"
+        - "arn:aws:dynamodb:us-east-1:496442284755:table/conversations/*"
+        - "arn:aws:dynamodb:us-east-1:496442284755:table/likes"
+        - "arn:aws:dynamodb:us-east-1:496442284755:table/likes/*"
 
 resources:
-  # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}
 
 functions:
   createUser:
-    handler: api/users/create.main
+    handler: src/controllers/users/createUser.main
     events:
       - http:
-          path: users
+          path: createUser
           method: post
           cors: true
           authorizer: aws_iam
-  getUser:
-    handler: api/users/get.main
+  activateUserAccount: 
+    handler: src/controllers/users/activateUserAccount.main
     events:
       - http:
-          path: users/{id}
-          method: get
-          cors: true
-          authorizer: aws_iam
-  listUser:
-    # Defines an HTTP API endpoint that calls the main function in list.js
-    # - path: url path is /notes
-    # - method: GET request
-    handler: api/users/list.main
-    events:
-      - http:
-          path: users
-          method: get
-          cors: true
-          authorizer: aws_iam
-  matchUser:
-    handler: api/users/match.main
-    events:
-      - http:
-          path: matchusers/{id}
-          method: get
-          cors: true
-          authorizer: aws_iam
-  updateUser:
-    # Defines an HTTP API endpoint that calls the main function in update.js
-    # - path: url path is /notes/{id}
-    # - method: PUT request
-    handler: api/users/update.main
-    events:
-      - http:
-          path: users/{id}
+          path: activateUserAccount
           method: put
           cors: true
           authorizer: aws_iam
-  deleteUser:
-      # Defines an HTTP API endpoint that calls the main function in delete.js
-      # - path: url path is /notes/{id}
-      # - method: DELETE request
-      handler: api/users/delete.main
-      events:
-        - http:
-            path: users/{id}
-            method: delete
-            cors: true
-            authorizer: aws_iam
+  getUserData:
+    handler: src/controllers/users/getUserData.main
+    events:
+      - http:
+          path: getUserData
+          method: get
+          cors: true
+          authorizer: aws_iam
+  getUserById:
+    handler: src/controllers/users/getUserById.main
+    events:
+      - http:
+          path: getUserById/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+  getMatchSuggestion:
+    handler: src/controllers/users/getMatchSuggestion.main
+    events:
+      - http:
+          path: getMatchSuggestion
+          method: get
+          cors: true
+          authorizer: aws_iam
+  updateUserData:
+    handler: src/controllers/users/updateUserData.main
+    events:
+      - http:
+          path: updateUserData
+          method: put
+          cors: true
+          authorizer: aws_iam
   reportMeme:
-      # Defines an HTTP API endpoint that calls the main function in delete.js
-      # - path: url path is /notes/{id}
-      # - method: DELETE request
-      handler: api/reportMeme/create.main
+      handler: src/controllers/memes/reportMemes.main
       events:
         - http:
-            path: reportmemes
+            path: reportmeme
             method: post
             cors: true
             authorizer: aws_iam
-  createMeme:
-      # Defines an HTTP API endpoint that calls the main function in delete.js
-      # - path: url path is /notes/{id}
-      # - method: DELETE request
-      handler: api/memes/create.main
+  likeMeme:
+      handler: src/controllers/memes/likeMemes.main
       events:
         - http:
-            path: memes
+            path: likeMeme
             method: post
             cors: true
             authorizer: aws_iam
-  updateMeme:
-    handler: api/memes/update.main
+  unlikeMeme:
+    handler: src/controllers/memes/unlikeMemes.main
     events:
       - http:
-          path: memes/{id}
-          method: put
-          cors: true
-          authorizer: aws_iam
-  deleteMeme:
-    handler: api/memes/delete.main
-    events:
-      - http:
-          path: memes/{id}
+          path: unlikeMeme/{id}
           method: delete
           cors: true
           authorizer: aws_iam
-  websocket-connect:
-    handler: api/websocket/connect.main
+  fetchMeme:
+    handler: src/controllers/memes/fetchMemes.main
     events:
-      - websocket:
-          route : $connect
-  websocket-disconnect:
-    handler: api/websocket/disconnect.main
+      - http:
+          path: fetchMeme/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+  getChatRooms:
+    handler: src/controllers/chats/getChatRooms.main
     events:
-      - websocket:
-          route : $disconnect
-  websocket-default:
-    handler: api/websocket/default.main
+      - http:
+          path: getChatRooms
+          method: get
+          cors: true
+          authorizer: aws_iam
+  unMatchUsers:
+    handler: src/controllers/chats/unMatchUsers.main
     events:
-      - websocket:
-          route : $default
-  websocket-message:
-    handler: api/websocket/message.main
+      - http:
+          path: unMatchUsers
+          method: post
+          cors: true
+          authorizer: aws_iam
+  likeUser:
+    handler: src/controllers/chats/likeUser.main
     events:
-      - websocket:
-          route : message
+      - http:
+          path: likeUser
+          method: post
+          cors: true
+          authorizer: aws_iam
